@@ -1,0 +1,55 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"     # RabbitMQ port for Logstash
+      - "15672:15672"   # RabbitMQ UI Management UI (optional for debug)
+      - "15692:15692"   # Prometheus metrics: HTTP (non-TLS) listener
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  weather_app:
+    build: .
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    restart: always
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.12.0
+    ports:
+      - "5044:5044"   # Beats input (optional)
+      - "9600:9600"   # Monitoring API
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    depends_on:
+      - rabbitmq
+    environment:
+      LS_JAVA_OPTS: "-Xms256m -Xmx256m"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+    environment:
+      - discovery.type=single-node   # single-node for simplicity
+      - xpack.security.enabled=false # security disabled for simplicity
+    ports:
+      - "9200:9200"
+
+  grafana:
+    image: grafana/grafana:10.2.3
+    ports:
+      - "3000:3000"
+    depends_on:
+      - elasticsearch
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/etc/grafana/dashboards
+
+volumes:
+  grafana-storage:

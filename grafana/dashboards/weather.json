@@ -1,0 +1,31 @@
+{
+  "uid": "weather",
+  "title": "Weather Dashboard",
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Temperature Over Time",
+      "datasource": "Elasticsearch",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "temperature"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Humidity Over Time",
+      "datasource": "Elasticsearch",
+      "targets": [
+        {
+          "refId": "B",
+          "query": "humidity"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 37,
+  "version": 1
+}
