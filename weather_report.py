@@ -14,7 +14,7 @@ API_URL = f'http://api.openweathermap.org/data/2.5/weather?q={CITY_NAME}&appid={
 RABBITMQ_HOST = os.getenv('RABBITMQ_HOST', 'localhost')
 QUEUE_NAME = 'weather_data'
 
-# Sampling rate, use 10 sec for debug
+# The 3600 sec (1H) is requested. Used 10 sec for debug
 SAMPLING_RATE = 10
 
 def get_weather():
@@ -46,7 +46,7 @@ def send_to_rabbitmq(message):
         routing_key=QUEUE_NAME,
         body=json.dumps(message),
         properties=pika.BasicProperties(
-            delivery_mode=2  # שמירה על הודעה גם לאחר קריסה
+            delivery_mode=2  # Keep the message even after the app crash
         )
     )
     print("Message sent successfully.") # debug

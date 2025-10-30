@@ -2,30 +2,92 @@
   "uid": "weather",
   "title": "Weather Dashboard",
   "timezone": "browser",
+  "schemaVersion": 37,
+  "version": 1,
+  "refresh": "10s",
+  "templating": {
+    "list": [
+      {
+        "name": "City",
+        "type": "query",
+        "datasource": "Elasticsearch",
+        "query": "{\"find\": \"terms\", \"field\": \"city.keyword\"}",
+        "includeAll": false,
+        "multi": false,
+        "refresh": 1,
+        "current": {
+          "text": "Jerusalem",
+          "value": "Jerusalem"
+        }
+      }
+    ]
+  },
   "panels": [
     {
       "type": "timeseries",
-      "title": "Temperature Over Time",
+      "title": "$City: Temperature Over Time",
       "datasource": "Elasticsearch",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius"
+        }
+      },
       "targets": [
         {
           "refId": "A",
-          "query": "temperature"
+          "query": "city.keyword:\"$City\"",
+          "metrics": [
+            {
+              "id": "1",
+              "type": "avg",
+              "field": "temperature"
+            }
+          ],
+          "bucketAggs": [
+            {
+              "id": "2",
+              "type": "date_histogram",
+              "field": "timestamp",
+              "settings": {
+                "interval": "auto"
+              }
+            }
+          ]
         }
       ]
     },
     {
       "type": "timeseries",
-      "title": "Humidity Over Time",
+      "title": "$City: Humidity Over Time",
       "datasource": "Elasticsearch",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        }
+      },
       "targets": [
         {
           "refId": "B",
-          "query": "humidity"
+          "query": "city.keyword:\"$City\"",
+          "metrics": [
+            {
+              "id": "3",
+              "type": "avg",
+              "field": "humidity"
+            }
+          ],
+          "bucketAggs": [
+            {
+              "id": "4",
+              "type": "date_histogram",
+              "field": "timestamp",
+              "settings": {
+                "interval": "auto"
+              }
+            }
+          ]
         }
       ]
     }
-  ],
-  "schemaVersion": 37,
-  "version": 1
+  ]
 }

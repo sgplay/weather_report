@@ -1,0 +1,9 @@
+apiVersion: 1
+
+contactPoints:
+  - name: default_email
+    receivers:
+      - uid: email_alert
+        type: email
+        settings:
+          addresses: sergey.gurovich@gmail.com
